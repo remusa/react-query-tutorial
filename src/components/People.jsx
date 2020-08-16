@@ -8,7 +8,8 @@ const fetchPeople = async () => {
 }
 
 const People = () => {
-  const { data, status } = useQuery('planets', fetchPeople)
+  const { data, status } = useQuery('people', fetchPeople)
+  console.log('data', data)
 
   const render = () => {
     if (status === "loading") {
@@ -29,6 +30,7 @@ const People = () => {
   return (
     <div>
       <h2>People</h2>
+
       {render()}
     </div>
   );
