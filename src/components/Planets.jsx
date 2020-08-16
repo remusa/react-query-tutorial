@@ -8,7 +8,12 @@ const fetchPlanets = async () => {
 }
 
 const Planets = () => {
-  const { data, status } = useQuery('planets', fetchPlanets)
+  const { data, status } = useQuery('planets', fetchPlanets, {
+    staleTime: 2000,
+    // cacheTime: 10,
+    // onSuccess: () => console.log("SUCCESS fetching planets")
+    // onError: () => console.log("ERROR fetching planets")
+  })
 
   const render = () => {
     if (status === "loading") {
