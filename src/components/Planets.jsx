@@ -1,22 +1,21 @@
 import React, { useState } from 'react';
-import { useQuery } from 'react-query';
+import { usePaginatedQuery } from 'react-query';
 import Planet from './PlanetsPlanet';
 
-const fetchPlanets = async (key, greeting, page) => {
-  console.log('greeting', greeting)
+const fetchPlanets = async (key, page) => {
   const res = await fetch(`https://swapi.dev/api/planets/?page=${page}`)
   return res.json()
 }
 
 const Planets = () => {
   const [page, setPage] = useState(1)
-  const { data, status } = useQuery(['planets', 'hello', page], fetchPlanets, {
-    staleTime: 2000,
+  const { resolvedData, latestData, status } = usePaginatedQuery(['planets', page], fetchPlanets, {
+    // staleTime: 2000,
     // cacheTime: 10,
     // onSuccess: () => console.log("SUCCESS fetching planets")
     // onError: () => console.log("ERROR fetching planets")
   })
-  console.log('data', data)
+  console.log('resolvedData', resolvedData)
 
   const render = () => {
     if (status === "loading") {
@@ -27,9 +26,25 @@ const Planets = () => {
     }
     else if (status === "success") {
       return (
-        <div>
-          {data.results.map((planet) => <Planet key={planet.name} planet={planet} />)}
-        </div>
+        <>
+          <button
+            onClick={() => setPage(old => Math.max(old - 1, 1))}
+            disabled={page === 1}
+            >
+              Previous page
+          </button>
+          <span>{ page }</span>
+          <button
+            onClick={() => setPage(old => (!latestData || !latestData.next ? old : old + 1))}
+            disabled={!latestData || !latestData.next}
+            >
+              Next page
+          </button>
+
+          <div>
+            {resolvedData.results.map((planet) => <Planet key={planet.name} planet={planet} />)}
+          </div>
+        </>
       )
     }
   }
@@ -37,10 +52,6 @@ const Planets = () => {
   return (
     <div>
       <h2>Planets</h2>
-
-      <button onClick={() => setPage(1)}>Page 1</button>
-      <button onClick={() => setPage(2)}>Page 2</button>
-      <button onClick={() => setPage(3)}>Page 3</button>
 
       {render()}
     </div>
